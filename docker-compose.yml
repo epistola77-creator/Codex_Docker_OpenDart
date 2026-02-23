@@ -1,0 +1,9 @@
+services:
+  opendart-mcp:
+    build: .
+    container_name: opendart-mcp
+    restart: unless-stopped
+    environment:
+      DART_API_KEY: "${DART_API_KEY}"
+    stdin_open: true
+    tty: true
