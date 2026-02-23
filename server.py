@@ -8,7 +8,12 @@ from mcp.server.fastmcp import FastMCP
 BASE_URL = "https://opendart.fss.or.kr/api"
 TIMEOUT = 20.0
 
-mcp = FastMCP("OpenDartMCP")
+APP_NAME = "OpenDartMCP"
+HTTP_HOST = os.getenv("MCP_HOST", "0.0.0.0")
+HTTP_PORT = int(os.getenv("MCP_PORT", "8000"))
+HTTP_PATH = os.getenv("MCP_PATH", "/mcp")
+
+mcp = FastMCP(APP_NAME)
 
 
 class DartAPIError(RuntimeError):
@@ -59,18 +64,7 @@ def search_disclosures(
     page_count: int = 10,
     last_reprt_at: str = "N",
 ) -> dict[str, Any]:
-    """
-    OpenDART list.json API를 사용해 공시 목록을 조회합니다.
-
-    Args:
-        corp_name: 회사명(부분 일치)
-        corp_code: 8자리 회사 고유코드
-        bgn_de: 조회 시작일(YYYYMMDD)
-        end_de: 조회 종료일(YYYYMMDD)
-        page_no: 페이지 번호
-        page_count: 페이지당 건수(최대 100)
-        last_reprt_at: 최종보고서만 조회 시 Y
-    """
+    """OpenDART list.json API를 사용해 공시 목록을 조회합니다."""
     today = datetime.now().strftime("%Y%m%d")
     start_of_year = datetime.now().strftime("%Y0101")
 
@@ -108,15 +102,7 @@ def get_financial_statement(
     bsns_year: str,
     reprt_code: str = "11011",
 ) -> dict[str, Any]:
-    """
-    OpenDART fnlttSinglAcnt.json API를 호출합니다.
-
-    reprt_code:
-      - 11013: 1분기
-      - 11012: 반기
-      - 11014: 3분기
-      - 11011: 사업(연간)
-    """
+    """OpenDART fnlttSinglAcnt.json API를 호출합니다."""
     if not corp_code or len(corp_code) != 8 or not corp_code.isdigit():
         raise ValueError("corp_code는 숫자 8자리여야 합니다.")
     if len(bsns_year) != 4 or not bsns_year.isdigit():
@@ -133,4 +119,9 @@ def get_financial_statement(
 
 
 if __name__ == "__main__":
-    mcp.run(transport="stdio")
+    mcp.run(
+        transport="streamable-http",
+        host=HTTP_HOST,
+        port=HTTP_PORT,
+        path=HTTP_PATH,
+    )
