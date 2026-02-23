@@ -1,0 +1,12 @@
+services:
+  opendart-mcp:
+    build: .
+    container_name: opendart-mcp
+    restart: unless-stopped
+    environment:
+      DART_API_KEY: "${DART_API_KEY}"
+      MCP_HOST: 0.0.0.0
+      MCP_PORT: 8000
+      MCP_PATH: /mcp
+    ports:
+      - "8000:8000"
